@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Form nhập liệu</title>
+</head>
+<body id="$class_name$" bgcolor="white">
+
+    <label for="account">Account</label>
+    <input type="text" id="account" /> </br>
+
+    <label for="hoten">HoTen</label>
+    <input type="text" id="hoten" /> </br>
+
+    <label for="quequan">QueQuan</label>
+    <input type="text" id="quequan" /> </br>
+
+    <label for="gioitinh">GioTinh</label>
+    <select id="gioitinh">
+        <option>Nam</option>
+        <option>Nữ</option>
+    </select> </br>
+
+    <label for="ngaysinh">NgaySinh</label>
+    <input type="text" id="ngaysinh" /> </br>
+
+    <label for="truonghoc">TruongHoc</label>
+    <input type="text" id="truonghoc" /> </br>
+
+    <label for="sodienthoai">SoDienThoai</label>
+    <input type="text" id="sodienthoai" /> </br>
+
+    <button type="button" id="okButton" onclick="onOk()">OK</button>
+
+    <script>
+        function onOk() {
+            var ret = []; 
+            var account = document.getElementById("account").value;
+            var hoten = document.getElementById("hoten").value;
+            var quequan = document.getElementById("quequan").value;
+            var ngaysinh = document.getElementById("ngaysinh").value;
+            var gioitinh = document.getElementById("gioitinh").value;
+            var truonghoc = document.getElementById("truonghoc").value;
+            var sodienthoai = document.getElementById("sodienthoai").value;
+
+            var noti = "";
+            if (!account) {
+                noti += "Account, ";
+            }
+            if (!quequan) {
+                noti += "QueQuan, ";
+            }
+            if (!hoten) {
+                noti += "HoTen, ";
+            }
+            if (!sodienthoai) {
+                noti += "SoDienThoai, ";
+            }
+
+            if (noti !== "") {
+                // Có lỗi: hiện tại không làm gì
+                return;
+            }
+
+            var phoneCheck = CheckNumberPhone(sodienthoai);
+            if (phoneCheck !== "") {
+                // Có lỗi số điện thoại: hiện tại không làm gì
+                return;
+            }
+
+            ret.push(account);
+            ret.push(hoten);
+            ret.push(quequan);
+            ret.push(ngaysinh);
+            ret.push(gioitinh);
+            ret.push(truonghoc);
+            ret.push(sodienthoai);
+
+            return ret;
+        }
+
+        function CheckNumberPhone(SoDienThoai) {
+            if (SoDienThoai.length !== 10 && SoDienThoai.length !== 11) {
+                return "Chiều dài số điện thoại không hợp lệ";
+            }
+
+            var vec = [ "0", "84", "+84"];
+            var check = false;
+            for (var i = 0; i < vec.length; i++) {
+                if (SoDienThoai.substring(0, i + 1) == vec[i]) {
+                    check = true;
+                    break;
+                }
+            }
+            if (!check) return "Sai định dạng số điện thoại";
+
+            var startIndex = SoDienThoai.substring(1);
+            for (var i = startIndex; i < SoDienThoai.length; i++) {
+                if (SoDienThoai[i] < "0" || SoDienThoai[i] > "9") {
+                    return "Số điện thoại chứa kí tự không hợp lệ";
+                }
+            }
+
+            return "";
+        }
+    </script>
+
+</body>
+</html>
