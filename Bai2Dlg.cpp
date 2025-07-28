@@ -114,9 +114,18 @@ BOOL CBai2Dlg::OnInitDialog()
 
 void CBai2Dlg::OnDocumentComplete(LPDISPATCH lpDis, LPCTSTR pStr)
 {
-	CComPtr<IHTMLDocument2> sPDoc; 
-	GetDHtmlDocument(&sPDoc); 
+	CComPtr<IHTMLDocument2> sPDoc;
+	GetDHtmlDocument(&sPDoc);
 
+
+	sPDoc->get_Script(&spScript);
+
+	OLECHAR* name[] = { L"getRecord", L"getRecordSelected" , L"onAdd"};
+	DISPID l_disP[3];
+	spScript->GetIDsOfNames(IID_NULL, name, 3, LOCALE_USER_DEFAULT, l_disP);
+	m_pid["getRecord"] = l_disP[0];
+	m_pid["getRecordSelected"] = l_disP[1];
+	m_pid["onAdd"] = l_disP[2];
 	CComPtr<IHTMLElement> sPEle;
 	GetElement(_T("table"), &sPEle); // Lấy ID và truyền vào smart pointer element
 
@@ -127,7 +136,7 @@ void CBai2Dlg::OnDocumentComplete(LPDISPATCH lpDis, LPCTSTR pStr)
 	sPTab.Release(); 
 	sPEle->QueryInterface(IID_IHTMLTable, (void**)(&sPTab.p)); 
 
-	// create a new row
+	//// create a new row
 	sPRow.Release(); 
 	sPTab->insertRow( -1, (IDispatch**)(&sPRow.p));
 
@@ -148,6 +157,7 @@ void CBai2Dlg::OnDocumentComplete(LPDISPATCH lpDis, LPCTSTR pStr)
 		CComBSTR sPstr(cStr); 
 		sPElement->put_innerText(sPstr);
 	}
+
 
 
 
@@ -208,13 +218,151 @@ HRESULT CBai2Dlg::OnButtonAdd(IHTMLElement* /*pElement*/)
 	CInputDialog dlg; 
 	if (dlg.DoModal() == IDOK)
 	{
+		// Lấy thông tin
+		std::vector<std::string> vt_strReceiver = dlg.GetInformation();
+		// Them vào trong database
+	
+		//vt_strReceiver = SqlConnector::getInstance()->Add(vt_strReceiver);
+
+		// Thêm vào màn hình
+		// Chuyển vt_strReceiver thành jsonStr
+		nlohmann::json j = vt_strReceiver; 
+		CA2W utf8(j.dump().c_str(), CP_UTF8); 
+		CStringW cStrW(utf8); 
+
+		// Khởi tạo con trỏ để invoke tới hàn 	
+		CComPtr<IHTMLDocument2> sPDoc;
+		GetDHtmlDocument(&sPDoc);
+		CComPtr<IDispatch> script;
+
+		// Lấy DISPID
+		sPDoc->get_Script(&script);
+		OLECHAR* name = L"onAdd";
+		DISPID l_disP;
+		script->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &l_disP);
+
+		// Gọi hàm 
+		CComVariant cVar(cStrW);
+		CComVariant result;
+		DISPPARAMS dp = { &cVar, nullptr, 1,0 };
+
+		script->Invoke(l_disP, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, &result, nullptr, nullptr);
+
+		AfxMessageBox(_T("Thêm bản ghi mới thành công"), MB_ICONINFORMATION);
 
 	}
 	return S_OK;
 }
 
+
 HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 {
+	
+	// Khởi tạo con trỏ để invoke tới hàn 	
+	CComPtr<IHTMLDocument2> sPDoc;
+	GetDHtmlDocument(&sPDoc);
+	CComPtr<IDispatch> script;
+
+	// Lấy DISPID
+	sPDoc->get_Script(&script);
+	OLECHAR* name = L"getRecordSelected";
+	DISPID l_disP;
+	script->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &l_disP);
+
+	// Gọi hàm 
+	CComVariant result;
+	DISPPARAMS dp = { nullptr, nullptr, 0,0 };
+	script->Invoke(l_disP, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, &result, nullptr, nullptr);
+
+	
+	BSTR bstr = result.bstrVal;
+	CStringW cStrW(bstr); 
+	std::string jsonStr = std::string(CW2A(cStrW, CP_UTF8)); 
+	// Chắc chắn json parse được 
+
+	// Lấy xem có bao nhiêu dòng đang được chọn 
+	std::vector<int> vt_Index;  
+	nlohmann::json j = nlohmann::json::parse(jsonStr);
+	
+	for (auto& item : j)
+	{
+		vt_Index.push_back(item.get<int>()); 
+	}
+
+	if (vt_Index.size() == 0)
+	{
+		AfxMessageBox(_T("Bạn phải chọn 1 bản ghi để chỉnh sửa"));
+		return S_OK;
+	}
+	else if (vt_Index.size() > 1)
+	{
+		AfxMessageBox(_T("Bạn không thể chọn nhiều hơn 1 bản ghi để chỉnh sửa"));
+		return S_OK;
+	}
+	else
+	{
+		// Nếu chỉ chỉ 1 dòng đang được chọn
+		// Lấy index + toàn bộ record 	
+		CInputDialog dlg;
+
+		std::vector<std::string> vt_str; // Chứa index + toàn bộ record 
+		vt_str.push_back(((vt_Index[0]) + "")); // push  cả id 
+		//[index ở đầu, record] ; 
+
+		// Gọi đến dialog 2 để lấy bản ghi 
+		// ------------------------------------------------------------
+		// Khởi tạo con trỏ để invoke tới hàn 	
+		CComPtr<IHTMLDocument2> sPDoc;
+		GetDHtmlDocument(&sPDoc);
+		CComPtr<IDispatch> script;
+
+		// Lấy DISPID
+		sPDoc->get_Script(&script);
+		OLECHAR* name = L"getRecord";
+		DISPID l_disP;
+		script->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &l_disP);
+
+		// Gọi hàm 
+		CComVariant result;
+		DISPPARAMS dp = { nullptr, nullptr, 1,0 };
+		script->Invoke(l_disP, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, &result, nullptr, nullptr);
+
+		BSTR bstr = result.bstrVal; 
+		CStringW cStrW(bstr); 
+		std::string jsonStr = std::string(CW2A(cStrW, CP_UTF8)); 
+		nlohmann::json j = nlohmann::json::parse(jsonStr); 
+
+		for (auto& item : j)
+		{
+			vt_str.push_back(item.get<std::string>()); 
+		}
+
+		dlg.SetInformation(vt_str); 
+
+		if (dlg.DoModal() == IDOK)
+		{
+			// Lấy dữ liệu đã sửa xong từ dialog
+			std::vector<std::string> vt_strReceiver = dlg.GetInformation();
+
+			// Sừa trong database
+
+			//SqlConnector::getInstance()->Edit(vt_strReceiver);
+
+			// Sửa trên màn hình
+
+			// [0] vì chỉ có duy nhất 1 phần tử
+
+			// ID không đổi 
+		/*	for (int i = 1; i <= 7; i++)
+			{
+				m_listCtrl.SetItemText(row, i, CA2T(vt_strReceiver[i].c_str(), CP_UTF8));
+			}
+			AfxMessageBox(_T("Chỉnh sửa bản ghi thành công"), MB_ICONINFORMATION);*/
+
+		}
+
+	}
+
 	return S_OK;
 }
 HRESULT CBai2Dlg::OnButtonRemove(IHTMLElement* /*pElement*/) 

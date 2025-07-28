@@ -5,6 +5,7 @@
 #error "CDHtmlDialog is not supported for Windows CE."
 #endif
 #include <string>
+#include "json.hpp"
 
 // CInputDialog dialog
 
@@ -19,6 +20,9 @@ public:
 	HRESULT OnButtonOK(IHTMLElement *pElement);
 	HRESULT OnButtonCancel(IHTMLElement *pElement);
 
+	std::vector<std::string> GetInformation();
+
+	void SetInformation(std::vector<std::string> vt); 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_INPUT_DIALOG, IDH = 103 };
@@ -32,6 +36,7 @@ protected:
 
 	std::map<std::string , DISPID> m_pid;
 	CComPtr<IDispatch> sPScript;
+	std::vector<std::string> vt_str;
 	DECLARE_MESSAGE_MAP()
 	DECLARE_DHTML_EVENT_MAP()
 };

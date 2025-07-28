@@ -1,11 +1,5 @@
-﻿<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8" />
-    <title>Form nhập liệu</title>
-</head>
-<body id="$class_name$" bgcolor="white">
-
+﻿<HTML>
+<BODY ID=$class_name$ BGCOLOR=WHITE>
     <label for="account">Account</label>
     <input type="text" id="account" /> </br>
 
@@ -15,14 +9,15 @@
     <label for="quequan">QueQuan</label>
     <input type="text" id="quequan" /> </br>
 
-    <label for="gioitinh">GioTinh</label>
+    <label for="gioitinh">GioiTinh</label>
     <select id="gioitinh">
         <option>Nam</option>
         <option>Nữ</option>
     </select> </br>
 
-    <label for="ngaysinh">NgaySinh</label>
+    <label>NgaySinh</label>
     <input type="text" id="ngaysinh" /> </br>
+
 
     <label for="truonghoc">TruongHoc</label>
     <input type="text" id="truonghoc" /> </br>
@@ -30,11 +25,34 @@
     <label for="sodienthoai">SoDienThoai</label>
     <input type="text" id="sodienthoai" /> </br>
 
-    <button type="button" id="okButton" onclick="onOk()">OK</button>
-
+    <button type="button" id="okButton">OK</button>
     <script>
+        if (!window.JSON) {
+            window.JSON = {
+                parse: function (s) { return eval('(' + s + ')'); },
+                stringify: function (obj) {
+                    var t = typeof obj;
+                    if (t != "object" || obj === null) {
+                        // simple value
+                        if (t == "string") obj = '"' + obj + '"';
+                        return String(obj);
+                    } else {
+                        // array or object
+                        var json = [], isArray = (obj && obj.constructor == Array);
+                        for (var n in obj) {
+                            var v = obj[n]; t = typeof v;
+                            if (t == "string") v = '"' + v + '"';
+                            else if (t == "object" && v !== null) v = JSON.stringify(v);
+                            json.push((isArray ? "" : '"' + n + '":') + String(v));
+                        }
+                        return (isArray ? "[" : "{") + String(json) + (isArray ? "]" : "}");
+                    }
+                }
+            };
+        }
+
         function onOk() {
-            var ret = []; 
+            var ret = [];
             var account = document.getElementById("account").value;
             var hoten = document.getElementById("hoten").value;
             var quequan = document.getElementById("quequan").value;
@@ -43,67 +61,76 @@
             var truonghoc = document.getElementById("truonghoc").value;
             var sodienthoai = document.getElementById("sodienthoai").value;
 
+
             var noti = "";
             if (!account) {
                 noti += "Account, ";
             }
+
             if (!quequan) {
                 noti += "QueQuan, ";
             }
+
             if (!hoten) {
                 noti += "HoTen, ";
             }
+
             if (!sodienthoai) {
-                noti += "SoDienThoai, ";
+                noti += "SoDienThoai ";
+            }
+            noti += "không được bỏ trống!";
+            if (noti != "không được bỏ trống!") {
+                return noti;
+            } else if ((noti = CheckNumberPhone(sodienthoai)) != "") {
+                return noti;
+            }
+            else {
+                ret.push(account);
+                ret.push(hoten);
+                ret.push(quequan);
+                ret.push(ngaysinh);
+                ret.push(gioitinh);
+                ret.push(truonghoc);
+                ret.push(sodienthoai);
+
+                return JSON.stringify(ret);
             }
 
-            if (noti !== "") {
-                // Có lỗi: hiện tại không làm gì
-                return;
-            }
-
-            var phoneCheck = CheckNumberPhone(sodienthoai);
-            if (phoneCheck !== "") {
-                // Có lỗi số điện thoại: hiện tại không làm gì
-                return;
-            }
-
-            ret.push(account);
-            ret.push(hoten);
-            ret.push(quequan);
-            ret.push(ngaysinh);
-            ret.push(gioitinh);
-            ret.push(truonghoc);
-            ret.push(sodienthoai);
-
-            return ret;
         }
-
         function CheckNumberPhone(SoDienThoai) {
-            if (SoDienThoai.length !== 10 && SoDienThoai.length !== 11) {
+            if (SoDienThoai.length != 10 && SoDienThoai.length != 11) {
                 return "Chiều dài số điện thoại không hợp lệ";
             }
 
-            var vec = [ "0", "84", "+84"];
+            var vec = ["0", "84", "+84"];
             var check = false;
-            for (var i = 0; i < vec.length; i++) {
-                if (SoDienThoai.substring(0, i + 1) == vec[i]) {
+            for (var i = 0; i <= 2; i++) {
+                if (vec[i] == SoDienThoai.substring(0, i + 1))
                     check = true;
-                    break;
-                }
             }
             if (!check) return "Sai định dạng số điện thoại";
-
-            var startIndex = SoDienThoai.substring(1);
-            for (var i = startIndex; i < SoDienThoai.length; i++) {
-                if (SoDienThoai[i] < "0" || SoDienThoai[i] > "9") {
+            var tmp = SoDienThoai.substring(1);
+            for (var i = 0; i < tmp.length; i++) {
+                if (tmp[i] < "0" || tmp[i] > "9")
                     return "Số điện thoại chứa kí tự không hợp lệ";
-                }
             }
 
             return "";
         }
-    </script>
+        function onInit(str) {
 
-</body>
-</html>
+            var arr = JSON.parse(str); 
+            document.getElementById("account").value = arr[0];
+            document.getElementById("hoten").value = arr[1];
+            document.getElementById("quequan").value = arr[2];
+            document.getElementById("ngaysinh").value = arr[3];
+            document.getElementById("gioitinh").value = arr[4];
+            document.getElementById("truonghoc").value = arr[5];
+            document.getElementById("sodienthoai").value = arr[6];
+
+        }
+        </script>
+
+
+</BODY>
+</HTML>

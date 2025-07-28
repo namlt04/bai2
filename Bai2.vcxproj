@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="Bai2.h" />
     <ClInclude Include="Bai2Dlg.h" />
     <ClInclude Include="CInputDialog.h" />

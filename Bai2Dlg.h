@@ -28,7 +28,8 @@ public:
 
 protected:
 	HICON m_hIcon;
-
+	CComPtr<IDispatch> spScript;
+	std::map<std::string, DISPID> m_pid; 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
