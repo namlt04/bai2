@@ -366,10 +366,17 @@
         }
 
        
-        function onRemove(array) {
-            var table = document.getElementById('table'); 
+        function onRemove(temp) {
+            var array = JSON.parse(temp); // đảm bảo là mảng thực
+            array.sort(function (a, b) { return b - a; });
+            var table = document.getElementById('table');
+
+            // Sắp xếp giảm dần để xóa từ dòng lớn đến nhỏ
+      
             for (var i = 0; i < array.length; i++) {
-                table.deleteRow(array[i]);  
+                if (array[i] >= 0 && array[i] < table.rows.length) {
+                    table.deleteRow(array[i]);
+                }
             }
         }
         function getRecordSelected() {
@@ -387,7 +394,7 @@
             var ret = []; 
             var table = document.getElementById('table'); 
             for (var i = 0; i < table.rows[index].cells.length; i++) { // Lặp qua từng cột của dòng index
-                ret.push(table.rows[index].cells[i]); 
+                ret.push(table.rows[index].cells[i].innerText); 
             }
             return JSON.stringify(ret); 
         }

@@ -51,7 +51,7 @@ END_MESSAGE_MAP()
 BEGIN_DHTML_EVENT_MAP(CBai2Dlg)
 	DHTML_EVENT_ONCLICK(_T("add"), OnButtonAdd)
 	DHTML_EVENT_ONCLICK(_T("edit"), OnButtonEdit)
-	DHTML_EVENT_ONCLICK(_T("remove"), OnButtonEdit)
+	DHTML_EVENT_ONCLICK(_T("remove"), OnButtonRemove)
 END_DHTML_EVENT_MAP()
 
 
@@ -303,10 +303,10 @@ HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 	{
 		// Nếu chỉ chỉ 1 dòng đang được chọn
 		// Lấy index + toàn bộ record 	
-		CInputDialog dlg;
+
 
 		std::vector<std::string> vt_str; // Chứa index + toàn bộ record 
-		vt_str.push_back(((vt_Index[0]) + "")); // push  cả id 
+		vt_str.push_back(std::to_string(vt_Index[0])); // push  cả id 
 		//[index ở đầu, record] ; 
 
 		// Gọi đến dialog 2 để lấy bản ghi 
@@ -319,13 +319,14 @@ HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 		// Lấy DISPID
 		sPDoc->get_Script(&script);
 		OLECHAR* name = L"getRecord";
-		DISPID l_disP;
-		script->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &l_disP);
+		DISPID pid;
+		script->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &pid);
 
 		// Gọi hàm 
+		CComVariant var(vt_Index[0]); 
 		CComVariant result;
-		DISPPARAMS dp = { nullptr, nullptr, 1,0 };
-		script->Invoke(l_disP, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, &result, nullptr, nullptr);
+		DISPPARAMS dp = { &var, nullptr, 1,0 };
+		script->Invoke(pid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, &result, nullptr, nullptr);
 
 		BSTR bstr = result.bstrVal; 
 		CStringW cStrW(bstr); 
@@ -336,7 +337,7 @@ HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 		{
 			vt_str.push_back(item.get<std::string>()); 
 		}
-
+		CInputDialog dlg;
 		dlg.SetInformation(vt_str); 
 
 		if (dlg.DoModal() == IDOK)
@@ -368,6 +369,52 @@ HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 HRESULT CBai2Dlg::OnButtonRemove(IHTMLElement* /*pElement*/) 
 {
 
+	CComPtr<IHTMLDocument2> spDoc; 
+	GetDHtmlDocument(&spDoc); 
+
+	CComPtr<IDispatch> spScript; 
+	spDoc->get_Script(&spScript);
+	OLECHAR* pName = L"getRecordSelected"; 
+	DISPID pid; 
+	spScript->GetIDsOfNames(IID_NULL, &pName, 1, LOCALE_USER_DEFAULT, &pid);
+
+	CComVariant result; 
+	DISPPARAMS dp = { nullptr, nullptr, 0, 0 }; 
+	spScript->Invoke(pid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, &result, nullptr, nullptr);
+
+	BSTR bstr = result.bstrVal;
+
+	CStringW cStrW(bstr); 
+	std::string jsonStr = std::string(CW2A(cStrW, CP_UTF8)); 
+	nlohmann::json j = nlohmann::json::parse(jsonStr); 
+
+	std::vector<int> vt;
+	for (auto& item : j)
+	{
+		vt.push_back(item.get<int>()); 
+	}
+	CString noti; 
+	noti.Format(_T("Bạn có chắc chắn muốn xóa %d bản ghi"), vt.size());
+	int resultYN = AfxMessageBox(noti, MB_ICONQUESTION | MB_YESNO); 
+	if (resultYN == IDYES) 
+	{
+		OLECHAR* pOnRemove = L"onRemove";
+		DISPID pidOnRemove;
+		spScript->GetIDsOfNames(IID_NULL, &pOnRemove, 1, LOCALE_USER_DEFAULT, &pidOnRemove);
+		
+		nlohmann::json j = vt;
+		std::string paramStr = j.dump(); 
+		CStringW cStrW = CStringW(CA2W(paramStr.c_str(), CP_UTF8));
+
+		BSTR bstr = ::SysAllocString(cStrW); 
+		CComVariant var(bstr); 
+		DISPPARAMS dpOnRemove = { &var, nullptr, 1,0 }; 
+		CComVariant resultRemove;
+		spScript->Invoke(pidOnRemove, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dpOnRemove, &resultRemove, nullptr, nullptr); 
+		::SysFreeString(bstr); 
+	} 
+
+	
 
 	return S_OK; 
 }

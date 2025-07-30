@@ -26,16 +26,7 @@ void CInputDialog::DoDataExchange(CDataExchange* pDX)
 }
 void CInputDialog::OnDocumentComplete(LPDISPATCH  lpDispatch, LPCTSTR lpStr)
 {
-	CComPtr<IHTMLDocument2> sPDoc;
-	GetDHtmlDocument(&sPDoc);
 
-	sPDoc->get_Script(&sPScript);
-
-	OLECHAR* name[] = { L"onOk", L"onInit" };
-	DISPID l_disP[1];
-	sPScript->GetIDsOfNames(IID_NULL, name, 1, LOCALE_USER_DEFAULT, l_disP);
-	m_pid["onOk"] = l_disP[0];
-	m_pid["onInit"] = l_disP[0];
 
 	// Nếu như nó có dữ liệu ban đầu yêu cầu ( tức sửa ) 
 	// Đẩy thông tin vào ô nhập
@@ -47,9 +38,20 @@ void CInputDialog::OnDocumentComplete(LPDISPATCH  lpDispatch, LPCTSTR lpStr)
 		CStringW cStrW(CA2W(strRecord.c_str(), CP_UTF8)); 
 		CComVariant cVar(cStrW); 
 
+
+		CComPtr<IHTMLDocument2> spDoc; 
+		GetDHtmlDocument(&spDoc); 
+
+		CComPtr<IDispatch> spScript; 
+		spDoc->get_Script(&spScript); 
+
+		OLECHAR* pName = L"onInit"; 
+		DISPID pid; 
+		spScript->GetIDsOfNames(IID_NULL, &pName, 1, LOCALE_USER_DEFAULT, &pid ); 
+
 		CComVariant result; 
-		DISPPARAMS dp = { &cVar, nullptr, 0, 0 }; 
-		sPScript->Invoke(m_pid["onInit"], IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, &result, nullptr, nullptr); 
+		DISPPARAMS dp = { &cVar, nullptr, 1, 0 }; 
+		spScript->Invoke(pid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, &result, nullptr, nullptr); 
 
 
 	}
@@ -79,9 +81,18 @@ HRESULT CInputDialog::OnButtonOK(IHTMLElement* /*pElement*/)
 
 	// sau khi an ok thi goi ham onOK javascript
 	// doi ket qua tra ve
+	CComPtr<IHTMLDocument2> spDoc; 
+	GetDHtmlDocument(&spDoc);
+	CComPtr<IDispatch> spScript; 
+	spDoc->get_Script(&spScript); 
+
+	OLECHAR* pName = L"onOk"; 
+	DISPID pid; 
+	spScript->GetIDsOfNames(IID_NULL, &pName, 1, LOCALE_USER_DEFAULT, &pid); 
+
 	DISPPARAMS dp = { nullptr, nullptr, 0, 0 };  // dùng để truyền tham số 
-	VARIANT result; 
-	sPScript->Invoke(m_pid["onOk"], IID_NULL,LOCALE_USER_DEFAULT,DISPATCH_METHOD, &dp, &result, nullptr, nullptr);
+	CComVariant result; 
+	spScript->Invoke(pid, IID_NULL,LOCALE_USER_DEFAULT,DISPATCH_METHOD, &dp, &result, nullptr, nullptr);
 	if (result.vt == VT_BSTR) // sử dụng == không phải la &
 	{
 		CStringW cStrW(result.bstrVal);

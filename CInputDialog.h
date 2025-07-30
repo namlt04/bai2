@@ -34,8 +34,6 @@ protected:
 
 	virtual void OnDocumentComplete(LPDISPATCH  lpDispatch, LPCTSTR lpStr);
 
-	std::map<std::string , DISPID> m_pid;
-	CComPtr<IDispatch> sPScript;
 	std::vector<std::string> vt_str;
 	DECLARE_MESSAGE_MAP()
 	DECLARE_DHTML_EVENT_MAP()
