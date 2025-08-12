@@ -1,36 +1,39 @@
 ﻿<HTML>
 <HEAD>
     <style>
+
+/*        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;  
+
+        }*/
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            overflow:auto;
+        }
+
+        .table {
+            flex: 8; /* chiếm 80% chiều cao */
+            background: lightyellow;
+            overflow-y: auto;
+            border : 1px solid #000000; 
+        }
+
         .control {
-            width: 33.33%;
-            position: absolute;
-            bottom: 0;
-            height: 40px;
-            font-size: 16px;
+            flex: 1; /* chiếm 20% chiều cao */
+            background: lightgray;
+            display: flex;
         }
-        div {
-            position: relative; 
-            height : 100%;
-        }
-        #table{
-            width :100%;
-            overflow: auto; 
-            padding-bottom : 50px; 
-            border: 1px solid;
-            border-color: black;
-            border-collapse : collapse;
-        }
-        #add {
-            left: 0%;
+        button{
+            flex :1;
         }
 
-        #edit {
-            left: 33.33%;
-        }
-
-        #remove {
-            left: 66.66%;
-        }
         .selected{
             background-color : green;
         }
@@ -39,8 +42,8 @@
  </style>
  </HEAD>
 <BODY ID=CBai2Dlg BGCOLOR=white style="font-family:MS Shell Dlg;font-size:8">
-    <div>
-        <table id="table">
+    <div id="table">
+        <table border="1" width="100%" >
             <tr>
                 <th>ID</th>
                 <th>Account</th>
@@ -51,273 +54,14 @@
                 <th>TruongHoc</th>
                 <th>SoDienThoai</th>
             </tr>
-
-            <tr>
-                <td>1</td>
-                <td>acc001</td>
-                <td>Nguyen Van A</td>
-                <td>Ha Noi</td>
-                <td>2000-01-01</td>
-                <td>Nam</td>
-                <td>Dai hoc ABC</td>
-                <td>0901234567</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>acc002</td>
-                <td>Tran Thi B</td>
-                <td>Hai Phong</td>
-                <td>2001-02-02</td>
-                <td>Nu</td>
-                <td>Dai hoc XYZ</td>
-                <td>0912345678</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>acc003</td>
-                <td>Le Van C</td>
-                <td>Da Nang</td>
-                <td>1999-03-03</td>
-                <td>Nam</td>
-                <td>Dai hoc DEF</td>
-                <td>0923456789</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>acc004</td>
-                <td>Pham Thi D</td>
-                <td>Can Tho</td>
-                <td>2002-04-04</td>
-                <td>Nu</td>
-                <td>Dai hoc GHI</td>
-                <td>0934567890</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>acc005</td>
-                <td>Hoang Van E</td>
-                <td>Hue</td>
-                <td>1998-05-05</td>
-                <td>Nam</td>
-                <td>Dai hoc JKL</td>
-                <td>0945678901</td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td>acc006</td>
-                <td>Dang Thi F</td>
-                <td>Nghe An</td>
-                <td>2003-06-06</td>
-                <td>Nu</td>
-                <td>Dai hoc MNO</td>
-                <td>0956789012</td>
-            </tr>
-            <tr>
-                <td>7</td>
-                <td>acc007</td>
-                <td>Bui Van G</td>
-                <td>Quang Ninh</td>
-                <td>2000-07-07</td>
-                <td>Nam</td>
-                <td>Dai hoc PQR</td>
-                <td>0967890123</td>
-            </tr>
-            <tr>
-                <td>8</td>
-                <td>acc008</td>
-                <td>Vo Thi H</td>
-                <td>Thanh Hoa</td>
-                <td>2001-08-08</td>
-                <td>Nu</td>
-                <td>Dai hoc STU</td>
-                <td>0978901234</td>
-            </tr>
-            <tr>
-                <td>9</td>
-                <td>acc009</td>
-                <td>Nguyen Van I</td>
-                <td>Nam Dinh</td>
-                <td>1997-09-09</td>
-                <td>Nam</td>
-                <td>Dai hoc VWX</td>
-                <td>0989012345</td>
-            </tr>
-            <tr>
-                <td>10</td>
-                <td>acc010</td>
-                <td>Tran Thi J</td>
-                <td>Ninh Binh</td>
-                <td>2002-10-10</td>
-                <td>Nu</td>
-                <td>Dai hoc YZA</td>
-                <td>0990123456</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>acc003</td>
-                <td>Le Van C</td>
-                <td>Da Nang</td>
-                <td>1999-03-03</td>
-                <td>Nam</td>
-                <td>Dai hoc DEF</td>
-                <td>0923456789</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>acc004</td>
-                <td>Pham Thi D</td>
-                <td>Can Tho</td>
-                <td>2002-04-04</td>
-                <td>Nu</td>
-                <td>Dai hoc GHI</td>
-                <td>0934567890</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>acc005</td>
-                <td>Hoang Van E</td>
-                <td>Hue</td>
-                <td>1998-05-05</td>
-                <td>Nam</td>
-                <td>Dai hoc JKL</td>
-                <td>0945678901</td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td>acc006</td>
-                <td>Dang Thi F</td>
-                <td>Nghe An</td>
-                <td>2003-06-06</td>
-                <td>Nu</td>
-                <td>Dai hoc MNO</td>
-                <td>0956789012</td>
-            </tr>
-            <tr>
-                <td>7</td>
-                <td>acc007</td>
-                <td>Bui Van G</td>
-                <td>Quang Ninh</td>
-                <td>2000-07-07</td>
-                <td>Nam</td>
-                <td>Dai hoc PQR</td>
-                <td>0967890123</td>
-            </tr>
-            <tr>
-                <td>8</td>
-                <td>acc008</td>
-                <td>Vo Thi H</td>
-                <td>Thanh Hoa</td>
-                <td>2001-08-08</td>
-                <td>Nu</td>
-                <td>Dai hoc STU</td>
-                <td>0978901234</td>
-            </tr>
-            <tr>
-                <td>9</td>
-                <td>acc009</td>
-                <td>Nguyen Van I</td>
-                <td>Nam Dinh</td>
-                <td>1997-09-09</td>
-                <td>Nam</td>
-                <td>Dai hoc VWX</td>
-                <td>0989012345</td>
-            </tr>
-            <tr>
-                <td>10</td>
-                <td>acc010</td>
-                <td>Tran Thi J</td>
-                <td>Ninh Binh</td>
-                <td>2002-10-10</td>
-                <td>Nu</td>
-                <td>Dai hoc YZA</td>
-                <td>0990123456</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>acc003</td>
-                <td>Le Van C</td>
-                <td>Da Nang</td>
-                <td>1999-03-03</td>
-                <td>Nam</td>
-                <td>Dai hoc DEF</td>
-                <td>0923456789</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>acc004</td>
-                <td>Pham Thi D</td>
-                <td>Can Tho</td>
-                <td>2002-04-04</td>
-                <td>Nu</td>
-                <td>Dai hoc GHI</td>
-                <td>0934567890</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>acc005</td>
-                <td>Hoang Van E</td>
-                <td>Hue</td>
-                <td>1998-05-05</td>
-                <td>Nam</td>
-                <td>Dai hoc JKL</td>
-                <td>0945678901</td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td>acc006</td>
-                <td>Dang Thi F</td>
-                <td>Nghe An</td>
-                <td>2003-06-06</td>
-                <td>Nu</td>
-                <td>Dai hoc MNO</td>
-                <td>0956789012</td>
-            </tr>
-            <tr>
-                <td>7</td>
-                <td>acc007</td>
-                <td>Bui Van G</td>
-                <td>Quang Ninh</td>
-                <td>2000-07-07</td>
-                <td>Nam</td>
-                <td>Dai hoc PQR</td>
-                <td>0967890123</td>
-            </tr>
-            <tr>
-                <td>8</td>
-                <td>acc008</td>
-                <td>Vo Thi H</td>
-                <td>Thanh Hoa</td>
-                <td>2001-08-08</td>
-                <td>Nu</td>
-                <td>Dai hoc STU</td>
-                <td>0978901234</td>
-            </tr>
-            <tr>
-                <td>9</td>
-                <td>acc009</td>
-                <td>Nguyen Van I</td>
-                <td>Nam Dinh</td>
-                <td>1997-09-09</td>
-                <td>Nam</td>
-                <td>Dai hoc VWX</td>
-                <td>0989012345</td>
-            </tr>
-            <tr>
-                <td>10</td>
-                <td>acc010</td>
-                <td>Tran Thi J</td>
-                <td>Ninh Binh</td>
-                <td>2002-10-10</td>
-                <td>Nu</td>
-                <td>Dai hoc YZA</td>
-                <td>0990123456</td>
-            </tr>
-
         </table>
-<button type="button" id="add" class="control">Add</button>
-<button type="button" id="edit" class="control">Edit</button>
-<button type="button" id="remove" class="control">Remove</button>
-        </div>
+    </div>
+
+    <div id="control">
+        <button type="button" id="add" >Add</button>
+        <button type="button" id="edit">Edit</button>
+        <button type="button" id="remove">Remove</button>
+    </div>
     <script>
         if (!window.JSON) {
             window.JSON = {
@@ -343,8 +87,8 @@
             };
         }
         function onAdd(param) {
-            var array = JSON.parse(param); 
-           
+            var array = JSON.parse(param);
+
             var table = document.getElementById('table');
             var newRow = table.insertRow(-1); // thêm vào cuối bảng
 
@@ -365,14 +109,14 @@
             };
         }
 
-       
+
         function onRemove(temp) {
             var array = JSON.parse(temp); // đảm bảo là mảng thực
             array.sort(function (a, b) { return b - a; });
             var table = document.getElementById('table');
 
             // Sắp xếp giảm dần để xóa từ dòng lớn đến nhỏ
-      
+
             for (var i = 0; i < array.length; i++) {
                 if (array[i] >= 0 && array[i] < table.rows.length) {
                     table.deleteRow(array[i]);
@@ -380,37 +124,37 @@
             }
         }
         function getRecordSelected() {
-            var selected = []; 
-            var table = document.getElementById('table'); 
+            var selected = [];
+            var table = document.getElementById('table');
             for (var i = 0; i < table.rows.length; i++) {
 
-                if ( table.rows[i].className.indexOf('selected') !== -1) {
-                    selected.push(i); 
+                if (table.rows[i].className.indexOf('selected') !== -1) {
+                    selected.push(i);
                 }
             }
             return JSON.stringify(selected);
         }
         function getRecord(index) {
-            var ret = []; 
-            var table = document.getElementById('table'); 
+            var ret = [];
+            var table = document.getElementById('table');
             for (var i = 0; i < table.rows[index].cells.length; i++) { // Lặp qua từng cột của dòng index
-                ret.push(table.rows[index].cells[i].innerText); 
+                ret.push(table.rows[index].cells[i].innerText);
             }
-            return JSON.stringify(ret); 
+            return JSON.stringify(ret);
         }
         window.onload = function () {
-            var table = document.getElementById('table');
-            for (var i = 1; i < table.rows.length; i++) {
-                table.rows[i].onclick = function () {
-                    // Kiểm tra nếu có class 'selected'
-                    var className = this.className;
-                    if (className.indexOf('selected') === -1) {
-                        this.className += ' selected';
-                    } else {
-                        this.className = className.replace('selected', '');
-                    }
-                };
-            }
+            //var table = document.getElementById('table');
+            //for (var i = 1; i < table.rows.length; i++) {
+            //    table.rows[i].onclick = function () {
+            //        // Kiểm tra nếu có class 'selected'
+            //        var className = this.className;
+            //        if (className.indexOf('selected') === -1) {
+            //            this.className += ' selected';
+            //        } else {
+            //            this.className = className.replace('selected', '');
+            //        }
+            //    };
+            //}
         };
     </script>
 </BODY>

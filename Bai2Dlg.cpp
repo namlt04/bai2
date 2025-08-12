@@ -77,6 +77,7 @@ BOOL CBai2Dlg::OnInitDialog()
 {
 	CDHtmlDialog::OnInitDialog();
 
+	ModifyStyle(0, WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_THICKFRAME);
 	// Add "About..." menu item to system menu.
 
 	// IDM_ABOUTBOX must be in the system command range.
@@ -114,49 +115,49 @@ BOOL CBai2Dlg::OnInitDialog()
 
 void CBai2Dlg::OnDocumentComplete(LPDISPATCH lpDis, LPCTSTR pStr)
 {
-	CComPtr<IHTMLDocument2> sPDoc;
-	GetDHtmlDocument(&sPDoc);
+	//CComPtr<IHTMLDocument2> sPDoc;
+	//GetDHtmlDocument(&sPDoc);
 
 
-	sPDoc->get_Script(&spScript);
+	//sPDoc->get_Script(&spScript);
 
-	OLECHAR* name[] = { L"getRecord", L"getRecordSelected" , L"onAdd"};
-	DISPID l_disP[3];
-	spScript->GetIDsOfNames(IID_NULL, name, 3, LOCALE_USER_DEFAULT, l_disP);
-	m_pid["getRecord"] = l_disP[0];
-	m_pid["getRecordSelected"] = l_disP[1];
-	m_pid["onAdd"] = l_disP[2];
-	CComPtr<IHTMLElement> sPEle;
-	GetElement(_T("table"), &sPEle); // Lấy ID và truyền vào smart pointer element
+	//OLECHAR* name[] = { L"getRecord", L"getRecordSelected" , L"onAdd"};
+	//DISPID l_disP[3];
+	//spScript->GetIDsOfNames(IID_NULL, name, 3, LOCALE_USER_DEFAULT, l_disP);
+	//m_pid["getRecord"] = l_disP[0];
+	//m_pid["getRecordSelected"] = l_disP[1];
+	//m_pid["onAdd"] = l_disP[2];
+	//CComPtr<IHTMLElement> sPEle;
+	//GetElement(_T("table"), &sPEle); // Lấy ID và truyền vào smart pointer element
 
-	// smart poiter table
-	CComPtr<IHTMLTable> sPTab;
-	CComPtr<IHTMLTableRow> sPRow;
-	// query interface 
-	sPTab.Release(); 
-	sPEle->QueryInterface(IID_IHTMLTable, (void**)(&sPTab.p)); 
+	//// smart poiter table
+	//CComPtr<IHTMLTable> sPTab;
+	//CComPtr<IHTMLTableRow> sPRow;
+	//// query interface 
+	//sPTab.Release(); 
+	//sPEle->QueryInterface(IID_IHTMLTable, (void**)(&sPTab.p)); 
 
-	//// create a new row
-	sPRow.Release(); 
-	sPTab->insertRow( -1, (IDispatch**)(&sPRow.p));
+	////// create a new row
+	//sPRow.Release(); 
+	//sPTab->insertRow( -1, (IDispatch**)(&sPRow.p));
 
-	CComPtr<IHTMLTableCell> sPCell;
+	//CComPtr<IHTMLTableCell> sPCell;
 
-	CComPtr<IHTMLElement> sPElement;
+	//CComPtr<IHTMLElement> sPElement;
 
 
-	for (int i = 0; i < 8; i++)
-	{
-		// create 8 cell 
-		sPCell.Release(); 
-		sPElement.Release(); 
-		sPRow->insertCell(-1, (IDispatch**)&sPCell.p);
-		// QueryInterface;
-		sPCell->QueryInterface(IID_IHTMLElement, (void**)(&sPElement)); 
-		CString cStr = _T("Le Thanh Nam"); 
-		CComBSTR sPstr(cStr); 
-		sPElement->put_innerText(sPstr);
-	}
+	//for (int i = 0; i < 8; i++)
+	//{
+	//	// create 8 cell 
+	//	sPCell.Release(); 
+	//	sPElement.Release(); 
+	//	sPRow->insertCell(-1, (IDispatch**)&sPCell.p);
+	//	// QueryInterface;
+	//	sPCell->QueryInterface(IID_IHTMLElement, (void**)(&sPElement)); 
+	//	CString cStr = _T("Le Thanh Nam"); 
+	//	CComBSTR sPstr(cStr); 
+	//	sPElement->put_innerText(sPstr);
+	//}
 
 
 
