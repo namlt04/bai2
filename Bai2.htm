@@ -1,39 +1,16 @@
 ﻿<HTML>
 <HEAD>
     <style>
-
-/*        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;  
-
-        }*/
         html, body {
             height: 100%;
+            width:100%;
             margin: 0;
             display: flex;
             flex-direction: column;
             overflow:auto;
         }
-
-        .table {
-            flex: 8; /* chiếm 80% chiều cao */
-            background: lightyellow;
-            overflow-y: auto;
-            border : 1px solid #000000; 
-        }
-
-        .control {
-            flex: 1; /* chiếm 20% chiều cao */
-            background: lightgray;
-            display: flex;
-        }
-        button{
-            flex :1;
-        }
-
+ 
+         
         .selected{
             background-color : green;
         }
@@ -42,8 +19,9 @@
  </style>
  </HEAD>
 <BODY ID=CBai2Dlg BGCOLOR=white style="font-family:MS Shell Dlg;font-size:8">
-    <div id="table">
-        <table border="1" width="100%" >
+    <div id="screen">
+    <div id="container_table">
+        <table border="1" width="100%" id="table">
             <tr>
                 <th>ID</th>
                 <th>Account</th>
@@ -57,10 +35,11 @@
         </table>
     </div>
 
-    <div id="control">
+    <div id="container_button">
         <button type="button" id="add" >Add</button>
         <button type="button" id="edit">Edit</button>
         <button type="button" id="remove">Remove</button>
+    </div>
     </div>
     <script>
         if (!window.JSON) {
@@ -86,6 +65,8 @@
                 }
             };
         }
+        
+        
         function onAdd(param) {
             var array = JSON.parse(param);
 
@@ -96,6 +77,7 @@
                 var newCell = newRow.insertCell(-1);
                 newCell.innerText = array[i]; // IE8 không hỗ trợ innerText trên tất cả element
             }
+
 
             newRow.onclick = function () {
                 var className = this.className;
@@ -109,9 +91,18 @@
             };
         }
 
+        function onUpdate(param) {
 
-        function onRemove(temp) {
-            var array = JSON.parse(temp); // đảm bảo là mảng thực
+            var array = JSON.parse(param); 
+            var table = document.getElementById('table'); 
+            var rowIndex = parseInt(array[0], 10); 
+            for (var i = 1; i < array.length; i++) {
+                alert(array[i]);
+                table.rows[rowIndex].cells[i - 1].innerText = array[i]; 
+            }
+        }
+        function onRemove() {
+            var array = JSON.parse(getRecordSelectedIndex()); // đảm bảo là mảng thực
             array.sort(function (a, b) { return b - a; });
             var table = document.getElementById('table');
 
@@ -123,7 +114,7 @@
                 }
             }
         }
-        function getRecordSelected() {
+        function getRecordSelectedIndex() {
             var selected = [];
             var table = document.getElementById('table');
             for (var i = 0; i < table.rows.length; i++) {
@@ -132,8 +123,24 @@
                     selected.push(i);
                 }
             }
+            return JSON.stringify(selected); 
+        }
+
+        function getRecordSelectedId() {
+            var selected = [];
+            var table = document.getElementById('table');
+            for (var i = 1; i < table.rows.length; i++) {
+
+                if (table.rows[i].className.indexOf('selected') !== -1) {
+                    selected.push(table.rows[i].cells[1].innerText);
+                    //alert(table.rows[i].cells[1].innerText);
+                }
+            }
+            
             return JSON.stringify(selected);
         }
+
+
         function getRecord(index) {
             var ret = [];
             var table = document.getElementById('table');
@@ -142,19 +149,40 @@
             }
             return JSON.stringify(ret);
         }
+        function resizeAreas() {
+            var h = document.body.clientHeight;
+            var w = document.body.clientWidth;
+            document.getElementById('container_table').style.height = (h * 0.9) + 'px';
+            document.getElementById('container_button').style.height = (h * 0.1) + 'px';
+
+            var btnW = w / 3; 
+            document.getElementById('add').style.width = btnW + 'px';
+            document.getElementById('add').style.left = '0px'; 
+            document.getElementById('add').style.height = (h*0.1) + 'px'; 
+
+            document.getElementById('edit').style.width = btnW + 'px';
+            document.getElementById('edit').style.left = btnW + 'px'
+            document.getElementById('edit').style.height = (h*0.1) + 'px'; 
+
+            document.getElementById('remove').style.width = btnW + 'px';
+            document.getElementById('remove').style.left = (2 * btnW) +  'px';  
+            document.getElementById('remove').style.height = (h*0.1) + 'px'; 
+        }
+        window.onresize = resizeAreas;
         window.onload = function () {
-            //var table = document.getElementById('table');
-            //for (var i = 1; i < table.rows.length; i++) {
-            //    table.rows[i].onclick = function () {
-            //        // Kiểm tra nếu có class 'selected'
-            //        var className = this.className;
-            //        if (className.indexOf('selected') === -1) {
-            //            this.className += ' selected';
-            //        } else {
-            //            this.className = className.replace('selected', '');
-            //        }
-            //    };
-            //}
+            resizeAreas();  
+            var table = document.getElementById('table');
+            for (var i = 1; i < table.rows.length; i++) {
+                table.rows[i].onclick = function () {
+                    // Kiểm tra nếu có class 'selected'
+                    var className = this.className;
+                    if (className.indexOf('selected') === -1) {
+                        this.className += ' selected';
+                    } else {
+                        this.className = className.replace('selected', '');
+                    }
+                };
+            }
         };
     </script>
 </BODY>

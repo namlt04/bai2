@@ -4,6 +4,7 @@
 
 #pragma once
 #include "CInputDialog.h"
+#include "SqlConnector.h"
 #include <vector>
 
 

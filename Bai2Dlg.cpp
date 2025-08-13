@@ -115,6 +115,8 @@ BOOL CBai2Dlg::OnInitDialog()
 
 void CBai2Dlg::OnDocumentComplete(LPDISPATCH lpDis, LPCTSTR pStr)
 {
+	// Sau khi document duoc hoan thanh 
+	// TRUY VAN DATABASE, LAY DU LIEU
 	//CComPtr<IHTMLDocument2> sPDoc;
 	//GetDHtmlDocument(&sPDoc);
 
@@ -158,6 +160,47 @@ void CBai2Dlg::OnDocumentComplete(LPDISPATCH lpDis, LPCTSTR pStr)
 	//	CComBSTR sPstr(cStr); 
 	//	sPElement->put_innerText(sPstr);
 	//}
+
+	std::vector<std::vector<CString>> vt_Data = SqlConnector::getInstance()->getAllRecord();
+	// VT_DATA CHỨA TOÀN BỘ DỮ LIỆU
+	// 
+
+	for (std::vector<CString> oneRecord : vt_Data)
+	{
+		std::vector<std::string> utf8Record;
+		for (CString x : oneRecord)
+		{
+			utf8Record.push_back(std::string(CT2A(x, CP_UTF8))); 
+		}
+		nlohmann::json j = utf8Record; 
+		CStringW strW = CStringW(CA2W(j.dump().c_str(), CP_UTF8));
+		CComBSTR bstr = CComBSTR(strW); 
+
+
+		
+		//j = nlohmann::json::dump(oneRecord);
+		// Goi ham de truyen vao
+		CComPtr<IHTMLDocument2> spDoc2;
+		GetDHtmlDocument(&spDoc2); 
+
+		CComPtr<IDispatch> spScript;
+		spDoc2->get_Script(&spScript);
+
+
+		OLECHAR* nameFunc = L"onAdd";
+		DISPID pid; 
+		spScript->GetIDsOfNames(IID_NULL, &nameFunc, 1, LOCALE_USER_DEFAULT, &pid);
+		CComVariant spVar(strW);
+		DISPPARAMS param = {&spVar, nullptr, 1 ,0}; 
+		spScript->Invoke(pid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &param, nullptr, nullptr, nullptr); 
+
+
+		
+
+
+		//invoke
+
+	}
 
 
 
@@ -223,7 +266,17 @@ HRESULT CBai2Dlg::OnButtonAdd(IHTMLElement* /*pElement*/)
 		std::vector<std::string> vt_strReceiver = dlg.GetInformation();
 		// Them vào trong database
 	
-		//vt_strReceiver = SqlConnector::getInstance()->Add(vt_strReceiver);
+
+		int id = SqlConnector::getInstance()->Add(vt_strReceiver[0],
+				vt_strReceiver[1], 
+				vt_strReceiver[2],
+				vt_strReceiver[3], 
+			1,
+				vt_strReceiver[5], 
+				vt_strReceiver[6]
+				);
+
+		vt_strReceiver.insert(vt_strReceiver.begin(), std::to_string(id));
 
 		// Thêm vào màn hình
 		// Chuyển vt_strReceiver thành jsonStr
@@ -266,7 +319,7 @@ HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 
 	// Lấy DISPID
 	sPDoc->get_Script(&script);
-	OLECHAR* name = L"getRecordSelected";
+	OLECHAR* name = L"getRecordSelectedIndex";
 	DISPID l_disP;
 	script->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &l_disP);
 
@@ -276,7 +329,7 @@ HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 	script->Invoke(l_disP, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, &result, nullptr, nullptr);
 
 	
-	BSTR bstr = result.bstrVal;
+	CComBSTR bstr = result.bstrVal;
 	CStringW cStrW(bstr); 
 	std::string jsonStr = std::string(CW2A(cStrW, CP_UTF8)); 
 	// Chắc chắn json parse được 
@@ -287,7 +340,7 @@ HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 	
 	for (auto& item : j)
 	{
-		vt_Index.push_back(item.get<int>()); 
+		vt_Index.push_back(item.get<int>());
 	}
 
 	if (vt_Index.size() == 0)
@@ -348,6 +401,15 @@ HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 
 			// Sừa trong database
 
+			SqlConnector::getInstance()->Edit(vt_strReceiver[1],
+				vt_strReceiver[2],
+				vt_strReceiver[3],
+				vt_strReceiver[4],
+				vt_strReceiver[5],
+				1,
+				vt_strReceiver[7],
+				vt_strReceiver[8]
+			);
 			//SqlConnector::getInstance()->Edit(vt_strReceiver);
 
 			// Sửa trên màn hình
@@ -355,11 +417,26 @@ HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 			// [0] vì chỉ có duy nhất 1 phần tử
 
 			// ID không đổi 
-		/*	for (int i = 1; i <= 7; i++)
-			{
-				m_listCtrl.SetItemText(row, i, CA2T(vt_strReceiver[i].c_str(), CP_UTF8));
-			}
-			AfxMessageBox(_T("Chỉnh sửa bản ghi thành công"), MB_ICONINFORMATION);*/
+		
+			// Gọi lên 1 hàm để có thể chỉnh sửa dữ liệu
+
+			nlohmann::json j = vt_strReceiver;
+			CStringW strW = CStringW(CA2W(j.dump().c_str(), CP_UTF8));
+
+			CComPtr<IHTMLDocument2> spDoc;
+			GetDHtmlDocument(&spDoc);
+
+			CComPtr<IDispatch> spScript;
+			spDoc->get_Script(&spScript);
+			OLECHAR* pName = L"onUpdate";
+			DISPID pid;
+			spScript->GetIDsOfNames(IID_NULL, &pName, 1, LOCALE_USER_DEFAULT, &pid);
+
+			CComVariant spVar(strW); 
+			DISPPARAMS dp = { &spVar, nullptr, 1, 0 };
+			spScript->Invoke(pid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, nullptr, nullptr, nullptr);
+
+			AfxMessageBox(_T("Chỉnh sửa bản ghi thành công"), MB_ICONINFORMATION);
 
 		}
 
@@ -375,7 +452,7 @@ HRESULT CBai2Dlg::OnButtonRemove(IHTMLElement* /*pElement*/)
 
 	CComPtr<IDispatch> spScript; 
 	spDoc->get_Script(&spScript);
-	OLECHAR* pName = L"getRecordSelected"; 
+	OLECHAR* pName = L"getRecordSelectedId"; 
 	DISPID pid; 
 	spScript->GetIDsOfNames(IID_NULL, &pName, 1, LOCALE_USER_DEFAULT, &pid);
 
@@ -383,7 +460,7 @@ HRESULT CBai2Dlg::OnButtonRemove(IHTMLElement* /*pElement*/)
 	DISPPARAMS dp = { nullptr, nullptr, 0, 0 }; 
 	spScript->Invoke(pid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dp, &result, nullptr, nullptr);
 
-	BSTR bstr = result.bstrVal;
+	CComBSTR bstr = result.bstrVal;
 
 	CStringW cStrW(bstr); 
 	std::string jsonStr = std::string(CW2A(cStrW, CP_UTF8)); 
@@ -392,7 +469,7 @@ HRESULT CBai2Dlg::OnButtonRemove(IHTMLElement* /*pElement*/)
 	std::vector<int> vt;
 	for (auto& item : j)
 	{
-		vt.push_back(item.get<int>()); 
+		vt.push_back(std::stoi(item.get<std::string>())); 
 	}
 	CString noti; 
 	noti.Format(_T("Bạn có chắc chắn muốn xóa %d bản ghi"), vt.size());
@@ -407,13 +484,16 @@ HRESULT CBai2Dlg::OnButtonRemove(IHTMLElement* /*pElement*/)
 		std::string paramStr = j.dump(); 
 		CStringW cStrW = CStringW(CA2W(paramStr.c_str(), CP_UTF8));
 
-		BSTR bstr = ::SysAllocString(cStrW); 
+		CComBSTR bstr = CComBSTR(cStrW); 
 		CComVariant var(bstr); 
-		DISPPARAMS dpOnRemove = { &var, nullptr, 1,0 }; 
+		DISPPARAMS dpOnRemove = { nullptr, nullptr, 0,0 }; 
 		CComVariant resultRemove;
 		spScript->Invoke(pidOnRemove, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dpOnRemove, &resultRemove, nullptr, nullptr); 
-		::SysFreeString(bstr); 
-	} 
+
+
+		// Xoa o database
+		SqlConnector::getInstance()->Remove(vt);
+	}
 
 	
 

@@ -96,10 +96,12 @@ HRESULT CInputDialog::OnButtonOK(IHTMLElement* /*pElement*/)
 	if (result.vt == VT_BSTR) // sử dụng == không phải la &
 	{
 		CStringW cStrW(result.bstrVal);
+	
 		CW2A utf8str(cStrW, CP_UTF8);
 		std::string jsonStr(utf8str);
 
 		if (nlohmann::json::accept(jsonStr)) {
+			vt_str.erase(vt_str.begin() + 2, vt_str.end());
 			nlohmann::json j = nlohmann::json::parse(jsonStr);
 
 			for (auto& item : j)
@@ -107,9 +109,9 @@ HRESULT CInputDialog::OnButtonOK(IHTMLElement* /*pElement*/)
 				vt_str.push_back(item.get<std::string>()); 
 			}
 			// Parse thành công, có thể sử dụng j
-			CString format; 
+		/*	CString format; 
 			format.Format(_T("%d"), vt_str.size()); 
-			AfxMessageBox(format); 
+			AfxMessageBox(format); */
 			CDHtmlDialog::OnOK();
 
 		}

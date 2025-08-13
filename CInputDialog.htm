@@ -1,4 +1,11 @@
 ﻿<HTML>
+<head>
+    <style>
+        #day{
+            width : 70px ;
+        }
+    </style>
+</head>
 <BODY ID=$class_name$ BGCOLOR=WHITE>
     <label for="account">Account</label>
     <input type="text" id="account" /> </br>
@@ -13,10 +20,18 @@
     <select id="gioitinh">
         <option>Nam</option>
         <option>Nữ</option>
-    </select> </br>
+    </select>
+    <br/>
 
     <label>NgaySinh</label>
-    <input type="text" id="ngaysinh" /> </br>
+    <select id="day">
+    </select>
+    <select id="month">
+    </select>
+    <select id="year">
+    </select>
+    <br/>
+
 
 
     <label for="truonghoc">TruongHoc</label>
@@ -56,12 +71,14 @@
             var account = document.getElementById("account").value;
             var hoten = document.getElementById("hoten").value;
             var quequan = document.getElementById("quequan").value;
-            var ngaysinh = document.getElementById("ngaysinh").value;
+            var ngaysinh = document.getElementById("year").value
+                + '/' + (document.getElementById("month").value < 10 ? "0" + document.getElementById("month").value : document.getElementById("month")) 
+                + '/' + (document.getElementById("day").value < 10 ? "0" + document.getElementById("day").value : document.getElementById("day")) 
             var gioitinh = document.getElementById("gioitinh").value;
             var truonghoc = document.getElementById("truonghoc").value;
             var sodienthoai = document.getElementById("sodienthoai").value;
 
-
+        
             var noti = "";
             if (!account) {
                 noti += "Account, ";
@@ -92,7 +109,9 @@
                 ret.push(gioitinh);
                 ret.push(truonghoc);
                 ret.push(sodienthoai);
-
+                for (var i = 0; i < ret.length; i++) {
+                    alert(ret[i]);
+                }
                 return JSON.stringify(ret);
             }
 
@@ -123,11 +142,45 @@
             document.getElementById("account").value = arr[2];
             document.getElementById("hoten").value = arr[3];
             document.getElementById("quequan").value = arr[4];
-            document.getElementById("ngaysinh").value = arr[5];
+            //document.getElementById("ngaysinh").value = arr[5];
             document.getElementById("gioitinh").value = arr[6];
             document.getElementById("truonghoc").value = arr[7];
             document.getElementById("sodienthoai").value = arr[8];
 
+        }
+        window.onload = function (){
+            var daySelect = document.getElementById('day');
+            var monthSelect = document.getElementById('month');
+            var yearSelect = document.getElementById('year');
+
+            // Vòng lặp điền giá trị cho Ngày (1-31)
+            for (var i = 1; i <= 31; i++) {
+                var option = document.createElement('option');
+                //option.textContent = i;
+                option.innerText = i;
+                option.value = i;
+                daySelect.appendChild(option);
+            }
+
+            // Vòng lặp điền giá trị cho Tháng (1-12)
+            for (var i = 1; i <= 12; i++) {
+                var option = document.createElement('option');
+                //option.textContent = i;
+                option.value = i;
+                option.innerText = i;
+
+                monthSelect.appendChild(option);
+            }
+
+
+            for (var i = 2000; i <= 2100; i++) {
+                var option = document.createElement('option');
+                //option.textContent = i;
+                option.value = i;
+                option.innerText = i;
+
+                yearSelect.appendChild(option);
+            }
         }
         </script>
 
