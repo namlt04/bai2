@@ -98,7 +98,17 @@ int SqlConnector::Add(std::string Account, std::string HoTen, std::string QueQua
 
 	pstm->setString(6, TruongHoc);
 	pstm->setString(7, SoDienThoai);
-	return pstm->executeUpdate();
+	pstm->executeQuery();
+
+
+	// Lấy ID của record vừa thêm vào
+	std::string queryId = "select last_insert_id();";
+	pstm = conn->prepareStatement(queryId);
+	res = pstm->executeQuery();
+	res->next();
+
+	// Trả về 1 vector
+	return res->getInt(1);
 
 }
 int SqlConnector::Edit(std::string ID, std::string Account, std::string HoTen, std::string QueQuan, std::string NgaySinh, int GioiTinh, std::string TruongHoc, std::string SoDienThoai)
@@ -115,8 +125,10 @@ int SqlConnector::Edit(std::string ID, std::string Account, std::string HoTen, s
 	pstm->setString(6, TruongHoc);
 	pstm->setString(7, SoDienThoai);
 	pstm->setString(8, ID);
-	//return pstm->executeUpdate();
+	return pstm->executeUpdate();
 
+
+	
 }
 BOOL SqlConnector::Remove(std::vector<int> vt_Id)
 {

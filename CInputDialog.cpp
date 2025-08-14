@@ -101,17 +101,14 @@ HRESULT CInputDialog::OnButtonOK(IHTMLElement* /*pElement*/)
 		std::string jsonStr(utf8str);
 
 		if (nlohmann::json::accept(jsonStr)) {
-			vt_str.erase(vt_str.begin() + 2, vt_str.end());
+			if (vt_str.size() >= 2)
+				vt_str.erase(vt_str.begin() + 2, vt_str.end());
 			nlohmann::json j = nlohmann::json::parse(jsonStr);
 
 			for (auto& item : j)
 			{
 				vt_str.push_back(item.get<std::string>()); 
 			}
-			// Parse thành công, có thể sử dụng j
-		/*	CString format; 
-			format.Format(_T("%d"), vt_str.size()); 
-			AfxMessageBox(format); */
 			CDHtmlDialog::OnOK();
 
 		}

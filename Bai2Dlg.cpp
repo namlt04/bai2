@@ -115,52 +115,6 @@ BOOL CBai2Dlg::OnInitDialog()
 
 void CBai2Dlg::OnDocumentComplete(LPDISPATCH lpDis, LPCTSTR pStr)
 {
-	// Sau khi document duoc hoan thanh 
-	// TRUY VAN DATABASE, LAY DU LIEU
-	//CComPtr<IHTMLDocument2> sPDoc;
-	//GetDHtmlDocument(&sPDoc);
-
-
-	//sPDoc->get_Script(&spScript);
-
-	//OLECHAR* name[] = { L"getRecord", L"getRecordSelected" , L"onAdd"};
-	//DISPID l_disP[3];
-	//spScript->GetIDsOfNames(IID_NULL, name, 3, LOCALE_USER_DEFAULT, l_disP);
-	//m_pid["getRecord"] = l_disP[0];
-	//m_pid["getRecordSelected"] = l_disP[1];
-	//m_pid["onAdd"] = l_disP[2];
-	//CComPtr<IHTMLElement> sPEle;
-	//GetElement(_T("table"), &sPEle); // Lấy ID và truyền vào smart pointer element
-
-	//// smart poiter table
-	//CComPtr<IHTMLTable> sPTab;
-	//CComPtr<IHTMLTableRow> sPRow;
-	//// query interface 
-	//sPTab.Release(); 
-	//sPEle->QueryInterface(IID_IHTMLTable, (void**)(&sPTab.p)); 
-
-	////// create a new row
-	//sPRow.Release(); 
-	//sPTab->insertRow( -1, (IDispatch**)(&sPRow.p));
-
-	//CComPtr<IHTMLTableCell> sPCell;
-
-	//CComPtr<IHTMLElement> sPElement;
-
-
-	//for (int i = 0; i < 8; i++)
-	//{
-	//	// create 8 cell 
-	//	sPCell.Release(); 
-	//	sPElement.Release(); 
-	//	sPRow->insertCell(-1, (IDispatch**)&sPCell.p);
-	//	// QueryInterface;
-	//	sPCell->QueryInterface(IID_IHTMLElement, (void**)(&sPElement)); 
-	//	CString cStr = _T("Le Thanh Nam"); 
-	//	CComBSTR sPstr(cStr); 
-	//	sPElement->put_innerText(sPstr);
-	//}
-
 	std::vector<std::vector<CString>> vt_Data = SqlConnector::getInstance()->getAllRecord();
 	// VT_DATA CHỨA TOÀN BỘ DỮ LIỆU
 	// 
@@ -268,14 +222,15 @@ HRESULT CBai2Dlg::OnButtonAdd(IHTMLElement* /*pElement*/)
 	
 
 		int id = SqlConnector::getInstance()->Add(vt_strReceiver[0],
-				vt_strReceiver[1], 
-				vt_strReceiver[2],
-				vt_strReceiver[3], 
-			1,
+			vt_strReceiver[1],
+			vt_strReceiver[2],
+			vt_strReceiver[3],
+			(vt_strReceiver[4] == "Nam") ? 1 : 0 ,
 				vt_strReceiver[5], 
 				vt_strReceiver[6]
 				);
-
+		vt_strReceiver[4] = (vt_strReceiver[4] == "Nam") ? "1" : "0",
+		
 		vt_strReceiver.insert(vt_strReceiver.begin(), std::to_string(id));
 
 		// Thêm vào màn hình
@@ -406,11 +361,10 @@ HRESULT CBai2Dlg::OnButtonEdit(IHTMLElement* /*pElement*/)
 				vt_strReceiver[3],
 				vt_strReceiver[4],
 				vt_strReceiver[5],
-				1,
+				(vt_strReceiver[6] == "Nam") ? 1 : 0, // Nam : 1, Nữ 0
 				vt_strReceiver[7],
 				vt_strReceiver[8]
 			);
-			//SqlConnector::getInstance()->Edit(vt_strReceiver);
 
 			// Sửa trên màn hình
 
@@ -469,7 +423,7 @@ HRESULT CBai2Dlg::OnButtonRemove(IHTMLElement* /*pElement*/)
 	std::vector<int> vt;
 	for (auto& item : j)
 	{
-		vt.push_back(std::stoi(item.get<std::string>())); 
+		vt.push_back(item.get<int>()); 
 	}
 	CString noti; 
 	noti.Format(_T("Bạn có chắc chắn muốn xóa %d bản ghi"), vt.size());

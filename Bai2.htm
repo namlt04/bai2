@@ -75,7 +75,17 @@
 
             for (var i = 0; i < 8; i++) {
                 var newCell = newRow.insertCell(-1);
-                newCell.innerText = array[i]; // IE8 không hỗ trợ innerText trên tất cả element
+                if (i == 0)
+                    array[i] = Number(array[i]); 
+                if (i == 4)
+                    array[i] = array[i].substring(0,10);
+                if (i == 5) {
+
+                    //alert(array[i]);
+                    newCell.innerText = (array[i] == 1) ? "Nam" : "Nữ"; // IE8 không hỗ trợ innerText trên tất cả element
+                }
+                else
+                    newCell.innerText = array[i];
             }
 
 
@@ -97,7 +107,7 @@
             var table = document.getElementById('table'); 
             var rowIndex = parseInt(array[0], 10); 
             for (var i = 1; i < array.length; i++) {
-                alert(array[i]);
+                //alert(array[i]);
                 table.rows[rowIndex].cells[i - 1].innerText = array[i]; 
             }
         }
@@ -132,7 +142,7 @@
             for (var i = 1; i < table.rows.length; i++) {
 
                 if (table.rows[i].className.indexOf('selected') !== -1) {
-                    selected.push(table.rows[i].cells[1].innerText);
+                    selected.push(Number(table.rows[i].cells[0].innerText));
                     //alert(table.rows[i].cells[1].innerText);
                 }
             }
